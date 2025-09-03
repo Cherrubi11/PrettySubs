@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // --- FILE PATHS ---
 const DATA_FILE = path.join(__dirname, "requests.json");
@@ -16,7 +16,6 @@ app.set("views", path.join(__dirname, "views"));
 
 // --- MIDDLEWARE ---
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public"))); // serve CSS/images/JS
 
 // --- HOMEPAGE ---
 app.get("/", (req, res) => {
