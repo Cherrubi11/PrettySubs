@@ -73,6 +73,12 @@ app.post("/submit-paid", (req, res) => {
   `);
 });
 
+
+
+
+
+
+
 // --- ADMIN / ORDERS PAGE ---
 app.get("/admin", (req, res) => {
   let requests = [];
@@ -89,7 +95,49 @@ app.get("/admin", (req, res) => {
   res.render("orders", { requests, paidRequests });
 });
 
+// --- DELETE REQUEST (FREE OR PAID) ---
+app.delete("/delete-request/:id", (req, res) => {
+  const id = req.params.id;
+  
+  // Try free requests first
+  let requests = [];
+  if (fs.existsSync(DATA_FILE)) {
+    requests = JSON.parse(fs.readFileSync(DATA_FILE));
+  }
+
+  // Try to find index
+  let index = requests.findIndex((r, i) => i.toString() === id);
+  if (index !== -1) {
+    requests.splice(index, 1);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(requests, null, 2));
+    return res.sendStatus(200);
+  }
+
+  // Then try paid requests
+  let paidRequests = [];
+  if (fs.existsSync(PAID_DATA_FILE)) {
+    paidRequests = JSON.parse(fs.readFileSync(PAID_DATA_FILE));
+  }
+
+  index = paidRequests.findIndex((r, i) => i.toString() === id);
+  if (index !== -1) {
+    paidRequests.splice(index, 1);
+    fs.writeFileSync(PAID_DATA_FILE, JSON.stringify(paidRequests, null, 2));
+    return res.sendStatus(200);
+  }
+
+  // If not found
+  res.sendStatus(404);
+});
+
+
+
+
+
 // --- START SERVER ---
 app.listen(PORT, () => {
   console.log(`🌸 server running at http://localhost:${PORT}`);
 });
+
+
+
