@@ -28,27 +28,12 @@
     border-left: 4px solid #ff69b4; 
     background: rgba(255,255,255,0.7); 
     border-radius: 10px; 
-    position: relative;
   }
   .request-item h3 { 
     margin-bottom: 5px; 
   }
   .request-item p { 
     margin: 3px 0; 
-  }
-  .delete-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: #ff4d6d;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-  .delete-btn:hover {
-    background: #d63384;
   }
   a { 
     color: #d63384; 
@@ -69,12 +54,11 @@
     <p>No free requests yet 💕</p>
   <% } else { %>
     <% requests.forEach(r => { %>
-      <div class="request-item" id="request-<%= r.id %>">
+      <div class="request-item">
         <h3><%= r.name %></h3>
         <p>Category: <%= r.category %></p>
         <p>Request: <%= r.request %></p>
         <p>Date: <%= r.date %></p>
-        <button class="delete-btn" onclick="deleteRequest('<%= r.id %>')">Delete</button>
       </div>
     <% }) %>
   <% } %>
@@ -86,36 +70,16 @@
     <p>No paid requests yet 💖</p>
   <% } else { %>
     <% paidRequests.forEach(r => { %>
-      <div class="request-item" id="request-<%= r.id %>">
+      <div class="request-item">
         <h3><%= r.name %></h3>
         <p>Package: <%= r.package %></p>
         <p>Request: <%= r.request %></p>
         <p>Payment Link: <a href="<%= r.paymentLink %>" target="_blank"><%= r.paymentLink %></a></p>
         <p>Date: <%= r.date %></p>
-        <button class="delete-btn" onclick="deleteRequest('<%= r.id %>')">Delete</button>
       </div>
     <% }) %>
   <% } %>
 </div>
-
-<script>
-  async function deleteRequest(id) {
-    if (!confirm("Are you sure you want to delete this request?")) return;
-
-    try {
-      const response = await fetch(`/delete-request/${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        const elem = document.getElementById(`request-${id}`);
-        if (elem) elem.remove();
-      } else {
-        alert("Oops! Could not delete the request.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Something went wrong 💔");
-    }
-  }
-</script>
 
 </body>
 </html>
