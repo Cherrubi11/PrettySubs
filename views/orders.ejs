@@ -57,7 +57,7 @@
     <p>No free requests yet 💕</p>
   <% } else { %>
     <% requests.forEach((r, i) => { %>
-      <div class="request-item" data-id="<%= i %>" data-type="free">
+      <div class="request-item" data-id="<%= r.id %>" data-type="free">
         <div class="request-details">
           <h3><%= r.name %></h3>
           <p>Category: <%= r.category %></p>
@@ -76,7 +76,7 @@
     <p>No paid requests yet 💖</p>
   <% } else { %>
     <% paidRequests.forEach((r, i) => { %>
-      <div class="request-item" data-id="<%= i %>" data-type="paid">
+      <div class="request-item" data-id="<%= r.id %>" data-type="paid">
         <div class="request-details">
           <h3><%= r.name %></h3>
           <p>Package: <%= r.package %></p>
@@ -114,3 +114,4 @@
 
 </body>
 </html>
+
