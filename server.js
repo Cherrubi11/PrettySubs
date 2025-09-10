@@ -2,25 +2,18 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto"); // for unique IDs ✨
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// --- FILE PATHS ---
 const DATA_FILE = path.join(__dirname, "requests.json");
 const PAID_DATA_FILE = path.join(__dirname, "paidRequests.json");
 
-// --- VIEW ENGINE ---
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// --- MIDDLEWARE ---
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// --- HOMEPAGE ---
-app.get("/", (req, res) => {
-  res.render("index");
-});
 
 // --- FREE REQUEST FORM SUBMIT ---
 app.post("/submit", (req, res) => {
@@ -32,6 +25,7 @@ app.post("/submit", (req, res) => {
   }
 
   requests.push({
+    id: crypto.randomUUID(), // 🌸 unique ID
     name,
     category,
     request,
@@ -57,6 +51,7 @@ app.post("/submit-paid", (req, res) => {
   }
 
   paidRequests.push({
+    id: crypto.randomUUID(), // 🌸 unique ID
     name,
     package: pkg,
     request,
@@ -87,6 +82,35 @@ app.get("/admin", (req, res) => {
   }
 
   res.render("orders", { requests, paidRequests });
+});
+
+// --- DELETE REQUEST (FREE OR PAID) ---
+app.delete("/delete-request/:id", (req, res) => {
+  const id = req.params.id;
+
+  let requests = [];
+  if (fs.existsSync(DATA_FILE)) {
+    requests = JSON.parse(fs.readFileSync(DATA_FILE));
+  }
+  const reqIndex = requests.findIndex(r => r.id === id);
+  if (reqIndex !== -1) {
+    requests.splice(reqIndex, 1);
+    fs.writeFileSync(DATA_FILE, JSON.stringify(requests, null, 2));
+    return res.sendStatus(200);
+  }
+
+  let paidRequests = [];
+  if (fs.existsSync(PAID_DATA_FILE)) {
+    paidRequests = JSON.parse(fs.readFileSync(PAID_DATA_FILE));
+  }
+  const paidIndex = paidRequests.findIndex(r => r.id === id);
+  if (paidIndex !== -1) {
+    paidRequests.splice(paidIndex, 1);
+    fs.writeFileSync(PAID_DATA_FILE, JSON.stringify(paidRequests, null, 2));
+    return res.sendStatus(200);
+  }
+
+  res.sendStatus(404);
 });
 
 // --- START SERVER ---
