@@ -28,19 +28,22 @@
     border-left: 4px solid #ff69b4; 
     background: rgba(255,255,255,0.7); 
     border-radius: 10px; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-  .request-item h3 { 
-    margin-bottom: 5px; 
+  .request-details { flex: 1; }
+  button.delete-btn { 
+    background: #ff4d6d; 
+    border: none; 
+    color: white; 
+    padding: 8px 12px; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    transition: 0.2s ease;
   }
-  .request-item p { 
-    margin: 3px 0; 
-  }
-  a { 
-    color: #d63384; 
-    text-decoration: none; 
-  }
-  a:hover { 
-    text-decoration: underline; 
+  button.delete-btn:hover { 
+    background: #e6004c; 
   }
 </style>
 </head>
@@ -53,12 +56,15 @@
   <% if (!requests || requests.length === 0) { %>
     <p>No free requests yet 💕</p>
   <% } else { %>
-    <% requests.forEach(r => { %>
-      <div class="request-item">
-        <h3><%= r.name %></h3>
-        <p>Category: <%= r.category %></p>
-        <p>Request: <%= r.request %></p>
-        <p>Date: <%= r.date %></p>
+    <% requests.forEach((r, i) => { %>
+      <div class="request-item" data-id="<%= i %>" data-type="free">
+        <div class="request-details">
+          <h3><%= r.name %></h3>
+          <p>Category: <%= r.category %></p>
+          <p>Request: <%= r.request %></p>
+          <p>Date: <%= r.date %></p>
+        </div>
+        <button class="delete-btn">Delete</button>
       </div>
     <% }) %>
   <% } %>
@@ -69,17 +75,42 @@
   <% if (!paidRequests || paidRequests.length === 0) { %>
     <p>No paid requests yet 💖</p>
   <% } else { %>
-    <% paidRequests.forEach(r => { %>
-      <div class="request-item">
-        <h3><%= r.name %></h3>
-        <p>Package: <%= r.package %></p>
-        <p>Request: <%= r.request %></p>
-        <p>Payment Link: <a href="<%= r.paymentLink %>" target="_blank"><%= r.paymentLink %></a></p>
-        <p>Date: <%= r.date %></p>
+    <% paidRequests.forEach((r, i) => { %>
+      <div class="request-item" data-id="<%= i %>" data-type="paid">
+        <div class="request-details">
+          <h3><%= r.name %></h3>
+          <p>Package: <%= r.package %></p>
+          <p>Request: <%= r.request %></p>
+          <p>Payment Link: <a href="<%= r.paymentLink %>" target="_blank"><%= r.paymentLink %></a></p>
+          <p>Date: <%= r.date %></p>
+        </div>
+        <button class="delete-btn">Delete</button>
       </div>
     <% }) %>
   <% } %>
 </div>
+
+<script>
+  document.addEventListener("click", async (e) => {
+    if (e.target.classList.contains("delete-btn")) {
+      const item = e.target.closest(".request-item");
+      const id = item.getAttribute("data-id");
+      const type = item.getAttribute("data-type");
+      
+      try {
+        const res = await fetch(`/delete-request/${id}`, { method: "DELETE" });
+        if (res.ok) {
+          item.remove(); // instantly remove from DOM
+        } else {
+          alert("❌ Could not delete item");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Error deleting request");
+      }
+    }
+  });
+</script>
 
 </body>
 </html>
