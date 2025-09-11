@@ -113,6 +113,13 @@ app.delete("/delete-request/:id", (req, res) => {
   res.sendStatus(404);
 });
 
+
+// --- HOME PAGE ---
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+
 // --- START SERVER ---
 app.listen(PORT, () => {
   console.log(`🌸 server running at http://localhost:${PORT}`);
