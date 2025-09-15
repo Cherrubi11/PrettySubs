@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // --- FREE REQUEST FORM SUBMIT ---
 app.post("/submit", (req, res) => {
-  const { name, category, request } = req.body;
+  const { name, category, request, channelName, visibility } = req.body;
 
   let requests = [];
   if (fs.existsSync(DATA_FILE)) {
@@ -25,10 +25,12 @@ app.post("/submit", (req, res) => {
   }
 
   requests.push({
-    id: crypto.randomUUID(), // 🌸 unique ID
+    id: crypto.randomUUID(),
     name,
     category,
     request,
+    channelName,
+    visibility,
     date: new Date().toLocaleString()
   });
 
@@ -41,9 +43,10 @@ app.post("/submit", (req, res) => {
   `);
 });
 
+
 // --- PAID REQUEST FORM SUBMIT ---
 app.post("/submit-paid", (req, res) => {
-  const { name, package: pkg, request, paymentLink } = req.body;
+  const { name, package: pkg, request, paymentLink, channelName, visibility } = req.body;
 
   let paidRequests = [];
   if (fs.existsSync(PAID_DATA_FILE)) {
@@ -51,11 +54,13 @@ app.post("/submit-paid", (req, res) => {
   }
 
   paidRequests.push({
-    id: crypto.randomUUID(), // 🌸 unique ID
+    id: crypto.randomUUID(),
     name,
     package: pkg,
     request,
     paymentLink,
+    channelName,
+    visibility,
     date: new Date().toLocaleString()
   });
 
@@ -67,6 +72,7 @@ app.post("/submit-paid", (req, res) => {
     <a href="/">Go back</a>
   `);
 });
+
 
 // --- ADMIN / ORDERS PAGE ---
 app.get("/admin", (req, res) => {
