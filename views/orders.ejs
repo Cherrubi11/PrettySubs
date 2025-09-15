@@ -56,12 +56,14 @@
   <% if (!requests || requests.length === 0) { %>
     <p>No free requests yet 💕</p>
   <% } else { %>
-    <% requests.forEach((r, i) => { %>
+    <% requests.forEach((r) => { %>
       <div class="request-item" data-id="<%= r.id %>" data-type="free">
         <div class="request-details">
           <h3><%= r.name %></h3>
           <p>Category: <%= r.category %></p>
           <p>Request: <%= r.request %></p>
+          <p>Channel: <%= r.channelName && r.channelName.trim() !== "" ? r.channelName : "N/A" %></p>
+          <p>Visibility: <%= r.visibility %></p>
           <p>Date: <%= r.date %></p>
         </div>
         <button class="delete-btn">Delete</button>
@@ -75,13 +77,15 @@
   <% if (!paidRequests || paidRequests.length === 0) { %>
     <p>No paid requests yet 💖</p>
   <% } else { %>
-    <% paidRequests.forEach((r, i) => { %>
+    <% paidRequests.forEach((r) => { %>
       <div class="request-item" data-id="<%= r.id %>" data-type="paid">
         <div class="request-details">
           <h3><%= r.name %></h3>
           <p>Package: <%= r.package %></p>
           <p>Request: <%= r.request %></p>
           <p>Payment Link: <a href="<%= r.paymentLink %>" target="_blank"><%= r.paymentLink %></a></p>
+          <p>Channel: <%= r.channelName && r.channelName.trim() !== "" ? r.channelName : "N/A" %></p>
+          <p>Visibility: <%= r.visibility %></p>
           <p>Date: <%= r.date %></p>
         </div>
         <button class="delete-btn">Delete</button>
@@ -114,4 +118,3 @@
 
 </body>
 </html>
-
