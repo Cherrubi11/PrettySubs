@@ -64,7 +64,7 @@
           <p>Request: <%= r.request %></p>
           <p>Channel: <%= r.channelName && r.channelName.trim() !== "" ? r.channelName : "N/A" %></p>
           <p>Visibility: <%= r.visibility %></p>
-          <p>Date: <%= r.date %></p>
+          <p>Date: <%= r.created_at.toLocaleString() %></p> <!-- FIXED -->
         </div>
         <button class="delete-btn">Delete</button>
       </div>
@@ -86,7 +86,7 @@
           <p>Payment Link: <a href="<%= r.paymentLink %>" target="_blank"><%= r.paymentLink %></a></p>
           <p>Channel: <%= r.channelName && r.channelName.trim() !== "" ? r.channelName : "N/A" %></p>
           <p>Visibility: <%= r.visibility %></p>
-          <p>Date: <%= r.date %></p>
+          <p>Date: <%= r.created_at.toLocaleString() %></p> <!-- FIXED -->
         </div>
         <button class="delete-btn">Delete</button>
       </div>
