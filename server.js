@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
-const { Pool } = require("pg"); // PostgreSQL
+const { Pool } = require("pg");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,19 +16,43 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+// --- UTILITY: Insert request into DB ---
+async function insertRequest(table, data) {
+  const { id, name, category, request, packageName, paymentLink, channelName, visibility, date } = data;
+
+  const query =
+    table === "free_requests"
+      ? `INSERT INTO free_requests (id, name, category, request, channelName, visibility, date)
+         VALUES ($1,$2,$3,$4,$5,$6,$7)`
+      : `INSERT INTO paid_requests (id, name, package, request, paymentLink, channelName, visibility, date)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`;
+
+  const values =
+    table === "free_requests"
+      ? [id, name, category, request, channelName, visibility, date]
+      : [id, name, packageName, request, paymentLink, channelName, visibility, date];
+
+  return pool.query(query, values);
+}
+
+// --- VALIDATION UTILITY ---
+function validateRequest(data, type = "free") {
+  const { name, request } = data;
+  if (!name?.trim() || !request?.trim()) return false;
+  if (type === "paid" && !data.paymentLink?.trim()) return false;
+  return true;
+}
+
 // --- FREE REQUEST FORM SUBMIT ---
 app.post("/submit", async (req, res) => {
   const { name, category, request, channelName, visibility } = req.body;
+  if (!validateRequest(req.body, "free")) return res.status(400).send("❌ Invalid request data");
+
   const id = crypto.randomUUID();
-  const date = new Date().toLocaleString();
+  const date = new Date().toISOString();
 
   try {
-    await pool.query(
-      `INSERT INTO free_requests (id, name, category, request, channelName, visibility, date)
-       VALUES ($1,$2,$3,$4,$5,$6,$7)`,
-      [id, name, category, request, channelName, visibility, date]
-    );
-
+    await insertRequest("free_requests", { id, name, category, request, channelName, visibility, date });
     res.send(`
       <h2>💕 Thank you, ${name}!</h2>
       <p>Your request has been saved. I’ll get back to you soon ✨</p>
@@ -42,17 +66,14 @@ app.post("/submit", async (req, res) => {
 
 // --- PAID REQUEST FORM SUBMIT ---
 app.post("/submit-paid", async (req, res) => {
-  const { name, package: pkg, request, paymentLink, channelName, visibility } = req.body;
+  const { name, package: packageName, request, paymentLink, channelName, visibility } = req.body;
+  if (!validateRequest(req.body, "paid")) return res.status(400).send("❌ Invalid request data");
+
   const id = crypto.randomUUID();
-  const date = new Date().toLocaleString();
+  const date = new Date().toISOString();
 
   try {
-    await pool.query(
-      `INSERT INTO paid_requests (id, name, package, request, paymentLink, channelName, visibility, date)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
-      [id, name, pkg, request, paymentLink, channelName, visibility, date]
-    );
-
+    await insertRequest("paid_requests", { id, name, packageName, request, paymentLink, channelName, visibility, date });
     res.send(`
       <h2>💖 Thank you, ${name}!</h2>
       <p>Your paid request has been received. Make sure your payment is sent via the link provided. ✨</p>
@@ -76,10 +97,9 @@ app.get("/admin", async (req, res) => {
   }
 });
 
-// --- DELETE REQUEST ---
+// --- DELETE REQUEST (ADMIN ONLY) ---
 app.delete("/delete-request/:id", async (req, res) => {
   const id = req.params.id;
-
   try {
     const free = await pool.query("DELETE FROM free_requests WHERE id=$1 RETURNING *", [id]);
     if (free.rowCount > 0) return res.sendStatus(200);
