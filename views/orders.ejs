@@ -99,8 +99,7 @@
     if (e.target.classList.contains("delete-btn")) {
       const item = e.target.closest(".request-item");
       const id = item.getAttribute("data-id");
-      const type = item.getAttribute("data-type");
-      
+
       try {
         const res = await fetch(`/delete-request/${id}`, { method: "DELETE" });
         if (res.ok) {
