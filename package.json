@@ -4,15 +4,20 @@
   "description": "Personalized subliminal requests website",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["subliminal", "manifestation", "requests"],
+  "keywords": [
+    "subliminal",
+    "manifestation",
+    "requests"
+  ],
   "author": "Cherrubi",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^2.2.0",
     "ejs": "^3.1.10",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
   }
 }
