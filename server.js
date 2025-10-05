@@ -15,6 +15,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const FREE_FILE = path.join(__dirname, "free_requests.json");
 const PAID_FILE = path.join(__dirname, "paid_requests.json");
 
+// ✅ Make images folder public
+app.use("/images", express.static(path.join(__dirname, "images")));
+
+// routes
+app.get("/", (req, res) => {
+  res.render("index");
+});
+
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+
 // --- Helpers to read/write JSON ---
 const readJSON = (file) => {
   try {
@@ -101,3 +111,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`🌸 server running at http://localhost:${PORT}`);
 });
+
